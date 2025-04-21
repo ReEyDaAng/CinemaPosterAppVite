@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "title": "Дюна 2",
+    "poster": "https://spec-rental.com.ua/wp-content/uploads/2024/03/Dyuna-2-780x450.jpg",
+    "rating": 8.7,
+    "genre": "Фантастика",
+    "year": 2024,
+    "description": "Сиквел епічної sci-fi пригоди.",
+    "trailer": "https://www.youtube.com/embed/n9xhJrPXop4"
+  },
+  {
+    "id": 2,
+    "title": "Оппенгеймер",
+    "poster": "https://images.kinorium.com/movie/poster/2828885/h280_51866809.jpg",
+    "rating": 8.9,
+    "genre": "Біографія",
+    "year": 2023,
+    "description": "Історія створення атомної бомби.",
+    "trailer": "https://www.youtube.com/embed/uYPbbksJxIg"
+  }
+]
