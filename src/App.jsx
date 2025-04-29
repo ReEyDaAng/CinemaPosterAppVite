@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Routes, Route } from 'react-router-dom';
+// src/App.jsx
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -13,12 +14,10 @@ import NotFound from './pages/NotFound';
 import { Moon, Sun } from 'lucide-react';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    const root = document.documentElement;
     if (darkMode) {
       root.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -52,27 +51,8 @@ function App() {
             <Route path="/movie/:id" element={<MovieDetails />} />
             <Route path="/search" element={<Search />} />
             <Route path="/schedule" element={<Schedule />} />
-
-            {/* Favorites: only for logged in users */}
-            <Route
-              path="/favorites"
-              element={
-                <RequireAuth redirectTo="/login">
-                  <Favorites />
-                </RequireAuth>
-              }
-            />
-
-            {/* Admin: only for admins */}
-            <Route
-              path="/admin"
-              element={
-                <RequireAdmin redirectTo="/">
-                  <AdminPanel />
-                </RequireAdmin>
-              }
-            />
-
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -80,17 +60,6 @@ function App() {
       </Router>
     </AuthProvider>
   );
-}
-
-// helper components
-function RequireAuth({ children, redirectTo }) {
-  const { user } = useContext(AuthContext);
-  return user ? children : <Navigate to={redirectTo} replace />;
-}
-
-function RequireAdmin({ children, redirectTo }) {
-  const { user } = useContext(AuthContext);
-  return user?.isAdmin ? children : <Navigate to={redirectTo} replace />;
 }
 
 export default App;

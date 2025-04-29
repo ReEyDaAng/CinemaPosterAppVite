@@ -1,18 +1,31 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
+  const { user, logout } = useAuth();
+
   return (
-    <nav className="sticky top-0 bg-gray-800 text-white p-4 flex justify-between">
-      <div>
-        <Link to="/" className="mr-4">Кіноафіша</Link>
-        <Link to="/search" className="mr-4">Пошук</Link>
-        <Link to="/schedule" className="mr-4">Сеанси</Link>
-        <Link to="/favorites" className="mr-4">Обрані</Link>
-      </div>
-      <div>
-        <Link to="/admin" className="mr-4">Адмін</Link>
-        <Link to="/login">Увійти</Link>
+    <nav className="bg-blue-800 text-white p-4 sticky top-0 z-50">
+      <div className="flex space-x-4">
+        <NavLink to="/"        className="hover:underline">Гловна</NavLink>
+        <NavLink to="/search"  className="hover:underline">Пошук</NavLink>
+        <NavLink to="/schedule"className="hover:underline">Сеанси</NavLink>
+
+        {user?.role === 'user' && (
+          <NavLink to="/favorites" className="hover:underline">Обрані</NavLink>
+        )}
+
+        {user?.role === 'admin' && (
+          <NavLink to="/admin" className="hover:underline">Адмін</NavLink>
+        )}
+
+        <div className="ml-auto">
+          {user
+            ? <button onClick={logout} className="hover:underline">Вийти</button>
+            : <NavLink to="/login" className="hover:underline">Увійти</NavLink>
+          }
+        </div>
       </div>
     </nav>
   );
