@@ -1,36 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyHeartIcon } from "./icons/empty-heart-icon.component";
+import { FilledHeartIcon } from "./icons/filled-heart-icon.component";
 
 function MovieCard({ movie, genres }) {
+  const [liked, setLiked] = useState(false); 
+
   const genreNames = movie.genre_ids
     .map((id) => genres[id])
     .filter(Boolean)
     .join(", ");
 
   return (
-    <Link
-      to={`/movie/${movie.id}`}
-      className="rounded-[20px] w-[300px] h-[450px] overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 dark:shadow-lg dark:hover:shadow-white-2xl"
-    >
-      <div className="relative">
+    <div className="relative rounded-[20px] w-[300px] h-[450px] overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-white dark:bg-gray-800 dark:shadow-lg dark:hover:shadow-white-2xl">
+      <Link to={`/movie/${movie.id}`}>
         <img
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
           alt={movie.title}
           className="w-full h-[300px] object-cover object-center"
         />
-        <div
-          className="border absolute right-[20px] top-[20px] border-white h-[32px] w-[32px] backdrop-blur-[5.93px] flex items-center justify-center"
-          style={{
-            borderRadius: "8.296px",
-            borderWidth: "0.593px",
-            background:
-              "linear-gradient(99deg, #FFF 3.36%, rgba(255, 255, 255, 0) 238.16%)",
-          }}
-        >
-          <EmptyHeartIcon />
-        </div>
-      </div>
+      </Link>
+
+      <button
+        onClick={() => setLiked((prev) => !prev)}
+        className="absolute right-[20px] top-[20px] h-[32px] w-[32px] backdrop-blur-[5.93px] flex items-center justify-center"
+        style={{
+          borderRadius: "8.296px",
+          borderWidth: "0.593px",
+          border: "1px solid white",
+          background:
+            "linear-gradient(99deg, #FFF 3.36%, rgba(255, 255, 255, 0) 238.16%)",
+        }}
+      >
+        {liked ? <FilledHeartIcon /> : <EmptyHeartIcon />}
+      </button>
 
       <div className="p-4">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
@@ -41,7 +44,7 @@ function MovieCard({ movie, genres }) {
         </p>
         <p className="text-yellow-500 font-semibold">★ {movie.vote_average}</p>
       </div>
-    </Link>
+    </div>
   );
 }
 
