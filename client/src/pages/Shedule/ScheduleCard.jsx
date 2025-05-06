@@ -1,6 +1,20 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"
 
-export default function SheduleCard({ movie, genres }) {
+export default function ScheduleCard({ movie, genres }) {
+  const navigate = useNavigate();
+
+  const handleTimeClick = (time) => {
+    navigate(`/seats/${movie.id}/${time}`, {
+      state: {
+        poster: movie.poster_path,
+        title: movie.title,
+        date: movie.release_date,
+      },
+    });
+  };
+  
+
   return (
     <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 max-w-3xl w-full gap-6">
       <img
@@ -16,16 +30,16 @@ export default function SheduleCard({ movie, genres }) {
           </p>
         </div>
         
-        {/* Піднімаємо вище */}
         <div className="flex flex-wrap gap-2 mt-[30px]">
-          {movie.times.map((time, idx) => (
-            <span
-              key={idx}
-              className="bg-red-600 text-white text-sm px-3 py-1 rounded-full"
-            >
-              {time}
-            </span>
-          ))}
+        {movie.times.map((time, idx) => (
+          <span
+            key={idx}
+            className="bg-red-600 text-white text-sm px-3 py-1 rounded-full cursor-pointer"
+            onClick={() => handleTimeClick(time)}
+          >
+            {time}
+          </span>
+        ))}
         </div>
       </div>
     </div>

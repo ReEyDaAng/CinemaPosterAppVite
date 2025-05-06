@@ -9,6 +9,7 @@ import AdminPanel from '../pages/AdminPanel'
 import AuthPage from '../pages/AuthPage'
 import NotFound from '../pages/NotFound'
 import Schedule from "../pages/Shedule/Schedule";
+import SeatSelection from "../pages/Seats/SeatSelection";
 import PrivateRoute from '../components/PrivateRoute'
 
 const AppRouter = () => (
@@ -19,6 +20,7 @@ const AppRouter = () => (
     <Route path="/search" element={<Search />} />
     <Route path="/favorites" element={<Favorites />} />
     <Route path="/schedule" element={<Schedule />} />
+    <Route path="/seats/:movieId/:time" element={<SeatSelection />} />
 
     {/* AUTH */}
     <Route path="/login" element={<AuthPage />} />

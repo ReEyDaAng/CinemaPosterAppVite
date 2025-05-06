@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SheduleCard from "./SheduleCard";
+import ScheduleCard from "./ScheduleCard";
 
 const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0Y2ZhNWE3MWEwM2NhOTlkMzFmNmIxNDhkOGY0MWEzMSIsIm5iZiI6MTc0NTkyNDk4NS44NDUsInN1YiI6IjY4MTBiMzc5MjEzN2YzNGMyNGVhYmY5OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.d6FLpDgj77XHTKhXD3tawH4UU09WOiw9_aWXdYk2vEg'; // скорочено для прикладу
 
@@ -13,12 +13,13 @@ export default function Schedule() {
         setStatus("loading");
         try {
           const [resMovies, resGenres] = await Promise.all([
-            fetch("https://api.themoviedb.org/3/movie/upcoming?language=uk-UA&page=1", {
+            fetch("https://api.themoviedb.org/3/movie/now_playing?language=uk-UA&page=1", {
               headers: {
                 accept: "application/json",
-                Authorization: ACCESS_TOKEN,
+                Authorization: `Bearer ${ACCESS_TOKEN}`,
               },
-            }),
+            })
+            ,
             fetch("https://api.themoviedb.org/3/genre/movie/list?language=uk", {
               headers: {
                 accept: "application/json",
@@ -55,7 +56,7 @@ export default function Schedule() {
   
     const generateRandomTimes = () => {
       const times = [];
-      const count = Math.floor(Math.random() * 4) + 2; // 2–5 сеансів
+      const count = Math.floor(Math.random() * 4) + 2; 
       for (let i = 0; i < count; i++) {
         const hour = String(10 + Math.floor(Math.random() * 10)).padStart(2, "0");
         const minute = String(Math.floor(Math.random() * 2) * 30).padStart(2, "0");
@@ -72,7 +73,7 @@ export default function Schedule() {
           <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Сеанси</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {movies.map((movie) => (
-              <SheduleCard key={movie.id} movie={movie} genres={genres} />
+              <ScheduleCard key={movie.id} movie={movie} genres={genres} />
             ))}
           </div>
         </div>
