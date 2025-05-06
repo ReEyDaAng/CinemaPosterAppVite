@@ -7,7 +7,7 @@ import Search from '../pages/Search'
 import Schedule from '../pages/Schedule'
 import Favorites from '../pages/Favorites'
 import AdminPanel from '../pages/AdminPanel'
-import Login from '../pages/Login'
+import AuthPage from '../pages/AuthPage'
 import NotFound from '../pages/NotFound'
 import PrivateRoute from '../components/PrivateRoute'
 
@@ -21,7 +21,7 @@ const AppRouter = () => (
     <Route path="/favorites" element={<Favorites />} />
 
     {/* AUTH */}
-    <Route path="/login" element={<Login />} />
+    <Route path="/login" element={<AuthPage />} />
 
     {/* PRIVATE */}
     <Route 
