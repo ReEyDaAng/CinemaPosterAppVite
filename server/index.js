@@ -1,11 +1,14 @@
-const express       = require('express');
-const cors          = require('cors');
-const cookieParser  = require('cookie-parser');
-const connectDB     = require('./config/db');
-const authRoutes    = require('./routes/auth');
-const movieRoutes   = require('./routes/movies');
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const connectDB = require('./config/db');
+const authRoutes = require('./routes/auth');
+const movieRoutes = require('./routes/movies');
 const sessionRoutes = require('./routes/sessions');
-const favRoutes     = require('./routes/favorites');
+const favRoutes = require('./routes/favorites');
+const adminRoutes = require('./routes/admin');
+const auth        = require('./middleware/auth');
 
 require('dotenv').config();
 connectDB();
@@ -22,7 +25,10 @@ app.use(cors({
 app.use('/api/auth',    authRoutes);
 app.use('/api/movies',  movieRoutes);
 app.use('/api/sessions',sessionRoutes);
-app.use('/api/favorites',favRoutes);
+app.use('/api/favorites', favRoutes);
+app.use('/api/admin', auth, adminRoutes);
+
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 const PORT = process.env.PORT || 5000;
 // якщо жоден маршрут не спрацював — не «висіти», а повернути 404
