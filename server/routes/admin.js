@@ -1,7 +1,7 @@
 const express = require('express');
 const multer  = require('multer');
 const path = require('path');
-
+const auth    = require('../middleware/auth');
 const Film    = require('../models/LocalMovie');
 const Session = require('../models/Session');
 const Ticket  = require('../models/Ticket');
@@ -177,6 +177,33 @@ router.get('/stats', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Не вдалося завантажити статистику' });
+  }
+});
+
+// POST /api/admin/tickets —> створення квитка
+router.post('/tickets', auth, async (req, res) => {
+  try {
+    const { session, date, time, seats } = req.body;
+
+    // базова валідація
+    if (!session || !date || !time || !Array.isArray(seats) || seats.length === 0) {
+      return res.status(400).json({ message: 'Неповні дані бронювання' });
+    }
+
+    // Створюємо й зберігаємо
+    const ticket = new Ticket({
+      session,
+      date,
+      time,
+      seats,
+      user: req.user.id
+    });
+
+    const saved = await ticket.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    console.error('Create ticket error:', err);
+    res.status(500).json({ message: 'Не вдалося створити квиток' });
   }
 });
 

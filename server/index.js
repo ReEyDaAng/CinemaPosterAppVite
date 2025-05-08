@@ -8,7 +8,8 @@ const movieRoutes = require('./routes/movies');
 const sessionRoutes = require('./routes/sessions');
 const favRoutes = require('./routes/favorites');
 const adminRoutes = require('./routes/admin');
-const auth        = require('./middleware/auth');
+const auth = require('./middleware/auth');
+const ticketsRouter = require('./routes/tickets')
 
 require('dotenv').config();
 connectDB();
@@ -27,6 +28,7 @@ app.use('/api/movies',  movieRoutes);
 app.use('/api/sessions',sessionRoutes);
 app.use('/api/favorites', favRoutes);
 app.use('/api/admin', auth, adminRoutes);
+app.use('/api/tickets', ticketsRouter);
 
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 

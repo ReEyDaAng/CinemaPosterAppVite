@@ -20,7 +20,7 @@ const AppRouter = () => (
     <Route path="/search" element={<Search />} />
     <Route path="/favorites" element={<Favorites />} />
     <Route path="/schedule" element={<Schedule />} />
-    <Route path="/seats/:movieId/:time" element={<SeatSelection />} />
+    <Route path="/seats/:sessionId/:time" element={<SeatSelection />} />
 
     {/* AUTH */}
     <Route path="/login" element={<AuthPage />} />
