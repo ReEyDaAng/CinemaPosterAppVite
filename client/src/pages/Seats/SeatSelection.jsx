@@ -25,7 +25,7 @@ export default function SeatSelection() {
     );
   };
 
-  const isAuthenticated = !!localStorage.getItem("token"); 
+  const isAuthenticated = !!localStorage.getItem("accessToken"); 
 
   return (
     <div className="ml-[290px] p-10 text-gray-900 dark:text-white">
