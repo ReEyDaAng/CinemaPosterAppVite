@@ -22,7 +22,7 @@ function App() {
   }, [darkMode]);
 
   return (
-    <AuthProvider>
+    <>
       <Sidebar />
       <Header darkMode={darkMode} setDarkMode={setDarkMode} />
 
@@ -31,7 +31,7 @@ function App() {
 
         <AppRouter />
       </div>
-    </AuthProvider>
+    </>
   );
 }
 

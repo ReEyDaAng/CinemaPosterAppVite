@@ -1,83 +1,97 @@
+// src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
 import MovieCard from "../../components/MovieCard";
 import Banner from "./Banner";
+import { useAuth } from "../../context/AuthContext";
+import { getLocalMovies } from "../../api/movies";
 
-const ACCESS_TOKEN =
-  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0Y2ZhNWE3MWEwM2NhOTlkMzFmNmIxNDhkOGY0MWEzMSIsIm5iZiI6MTc0NTkyNDk4NS44NDUsInN1YiI6IjY4MTBiMzc5MjEzN2YzNGMyNGVhYmY5OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.d6FLpDgj77XHTKhXD3tawH4UU09WOiw9_aWXdYk2vEg"; // скорочено для прикладу
+export default function Home() {
+  const { accessToken } = useAuth();
+  const [localMovies, setLocalMovies] = useState([]);
+  const [tmdbMovies, setTmdbMovies]   = useState([]);
+  const [genresMap, setGenresMap]     = useState({});
+  const [status, setStatus]           = useState("idle");
+  const [page, setPage]               = useState(1);
+  const [totalPages, setTotalPages]   = useState(1);
 
-function Home() {
-  const [movies, setMovies] = useState([]);
-  const [status, setStatus] = useState("idle");
-  const [genres, setGenres] = useState({});
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  // Беремо API-ключ із .env
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (!accessToken) return;  // чекаємо, поки є токен
+
+    const fetchAll = async () => {
       setStatus("loading");
       try {
-        const [moviesRes1, moviesRes2, genresRes] = await Promise.all([
+        // 1) Отримуємо локальні фільми
+        const local = await getLocalMovies(accessToken);
+        setLocalMovies(local);
+
+        // 2) Два запити до TMDb popular + genres
+        const [res1, res2, resGenres] = await Promise.all([
           fetch(
-            `https://api.themoviedb.org/3/movie/popular?language=uk-UA&page=${page}`,
-            {
-              headers: {
-                accept: "application/json",
-                Authorization: `Bearer ${ACCESS_TOKEN}`,
-              },
-            }
+            `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page}`
           ),
           fetch(
-            `https://api.themoviedb.org/3/movie/popular?language=uk-UA&page=${
-              page + 1
-            }`,
-            {
-              headers: {
-                accept: "application/json",
-                Authorization: `Bearer ${ACCESS_TOKEN}`,
-              },
-            }
+            `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page +
+              1}`
           ),
-          fetch("https://api.themoviedb.org/3/genre/movie/list?language=uk", {
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${ACCESS_TOKEN}`,
-            },
-          }),
+          fetch(
+            `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=uk-UA`
+          ),
         ]);
 
-        const moviesData1 = await moviesRes1.json();
-        const moviesData2 = await moviesRes2.json();
-        const genresData = await genresRes.json();
+        if (!res1.ok || !res2.ok || !resGenres.ok) {
+          throw new Error("Помилка при завантаженні даних TMDb");
+        }
 
-        const allMovies = [...moviesData1.results, ...moviesData2.results];
-        const genresMap = {};
-        genresData.genres.forEach((genre) => {
-          genresMap[genre.id] = genre.name;
+        const tmdb1      = await res1.json();
+        const tmdb2      = await res2.json();
+        const genresData = await resGenres.json();
+
+        setTotalPages(tmdb1.total_pages);
+
+        // 3) Створюємо мапу жанрів
+        const map = {};
+        genresData.genres.forEach((g) => {
+          map[g.id] = g.name;
         });
+        setGenresMap(map);
 
-        setMovies(allMovies);
-        setGenres(genresMap);
-        setTotalPages(moviesData1.total_pages);
+        // 4) Зберігаємо результати
+        setTmdbMovies([...tmdb1.results, ...tmdb2.results]);
+
         setStatus("succeeded");
-      } catch (error) {
-        console.error("Помилка завантаження:", error);
+      } catch (err) {
+        console.error("Home fetch error:", err);
         setStatus("failed");
       }
     };
 
-    fetchData();
-  }, [page]);
+    fetchAll();
+  }, [accessToken, page, apiKey]);
 
   if (status === "loading") return <p>Завантаження...</p>;
-  if (status === "failed") return <p>Помилка завантаження</p>;
+  if (status === "failed")  return <p>Не вдалося завантажити фільми.</p>;
+
+  // 5) Об’єднуємо локальні та TMDb
+  const movies = [
+    ...localMovies.map((m) => ({
+      ...m,
+      id: m._id,                 // щоб MovieCard міг взяти movie.id
+      genre_ids: m.genre_ids || [],
+      vote_average: m.vote_average || 0,
+    })),
+    ...tmdbMovies,
+  ];
 
   return (
     <div className="space-y-10 mt-[-56px]">
-      <Banner movie={movies[0]} />
+      {movies.length > 0 && <Banner movie={movies[0]} genres={genresMap} />}
 
       <div className="ml-[290px] flex flex-wrap gap-[24px]">
         {movies.slice(1, 21).map((movie) => (
-          <MovieCard key={movie.id} movie={movie} genres={genres} />
+          <MovieCard key={movie.id} movie={movie} genres={genresMap} />
         ))}
       </div>
 
@@ -105,5 +119,3 @@ function Home() {
     </div>
   );
 }
-
-export default Home;

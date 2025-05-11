@@ -8,8 +8,8 @@ import Favorites from '../pages/Favorites'
 import AdminPanel from '../pages/AdminPanel'
 import AuthPage from '../pages/AuthPage'
 import NotFound from '../pages/NotFound'
-import Schedule from "../pages/Shedule/Schedule";
-import SeatSelection from "../pages/Seats/SeatSelection";
+import Schedule from "../pages/Shedule/Schedule"
+import SeatSelection from "../pages/Seats/SeatSelection"
 import PrivateRoute from '../components/PrivateRoute'
 
 const AppRouter = () => (
