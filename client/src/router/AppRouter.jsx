@@ -2,15 +2,15 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 
 import Home from '../pages/Home/Home'
-import MovieDetails from '../pages/MovieDetails'
-import Search from '../pages/Search'
+import Search from '../pages/Search/Search'
 import Favorites from '../pages/Favorites'
 import AdminPanel from '../pages/AdminPanel'
 import AuthPage from '../pages/AuthPage'
-import NotFound from '../pages/NotFound'
+import NotFound from '../pages/NotFound/NotFound'
 import Schedule from "../pages/Shedule/Schedule";
 import SeatSelection from "../pages/Seats/SeatSelection";
 import PrivateRoute from '../components/PrivateRoute'
+import MovieDetails from "../pages/MovieDetails/MovieDetails";
 
 const AppRouter = () => (
   <Routes>
@@ -21,6 +21,7 @@ const AppRouter = () => (
     <Route path="/favorites" element={<Favorites />} />
     <Route path="/schedule" element={<Schedule />} />
     <Route path="/seats/:sessionId/:time" element={<SeatSelection />} />
+    <Route path="/movie/:id" element={<MovieDetails />} />
 
     {/* AUTH */}
     <Route path="/login" element={<AuthPage />} />
