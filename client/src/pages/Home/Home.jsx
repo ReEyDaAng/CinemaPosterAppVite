@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MovieCard from "../../components/MovieCard";
 import Banner from "./Banner";
-
-const ACCESS_TOKEN =
-  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0Y2ZhNWE3MWEwM2NhOTlkMzFmNmIxNDhkOGY0MWEzMSIsIm5iZiI6MTc0NTkyNDk4NS44NDUsInN1YiI6IjY4MTBiMzc5MjEzN2YzNGMyNGVhYmY5OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.d6FLpDgj77XHTKhXD3tawH4UU09WOiw9_aWXdYk2vEg"; // скорочено для прикладу
+import { ACCESS_TOKEN } from "../../constants/token";
 
 function Home() {
   const [movies, setMovies] = useState([]);

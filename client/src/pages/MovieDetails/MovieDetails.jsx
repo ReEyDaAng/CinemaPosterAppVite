@@ -3,10 +3,8 @@ import { useParams } from "react-router-dom";
 import { format } from "date-fns";
 import { FilledHeartIcon } from "../../components/icons/filled-heart-icon.component";
 import { EmptyHeartIcon } from "../../components/icons/empty-heart-icon.component";
-
-const ACCESS_TOKEN =
-  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0Y2ZhNWE3MWEwM2NhOTlkMzFmNmIxNDhkOGY0MWEzMSIsIm5iZiI6MTc0NTkyNDk4NS44NDUsInN1YiI6IjY4MTBiMzc5MjEzN2YzNGMyNGVhYmY5OSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.d6FLpDgj77XHTKhXD3tawH4UU09WOiw9_aWXdYk2vEg"; // Bearer token
-
+import { ACCESS_TOKEN } from "../../constants/token";
+ 
 export default function MovieDetails() {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
