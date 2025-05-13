@@ -9,6 +9,7 @@ const sessionRoutes = require('./routes/sessions');
 const favRoutes = require('./routes/favorites');
 const adminRoutes = require('./routes/admin');
 const auth = require('./middleware/auth');
+const favoritesRouter = require('./routes/favorites');
 const ticketsRouter = require('./routes/tickets')
 
 require('dotenv').config();
@@ -29,6 +30,7 @@ app.use('/api/sessions',sessionRoutes);
 app.use('/api/favorites', favRoutes);
 app.use('/api/admin', auth, adminRoutes);
 app.use('/api/tickets', ticketsRouter);
+app.use('/api/favorites', favoritesRouter);
 
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
