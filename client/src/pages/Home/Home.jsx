@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
-import MovieCard from "../../components/MovieCard";
-import Banner    from "./Banner";
+import MovieCard       from "../../components/MovieCard";
+import Banner          from "./Banner";
 
-import { useAuth }        from "../../context/AuthContext";
+import { useAuth }     from "../../context/AuthContext";
 import { getLocalMovies } from "../../api/movies";
 
 export default function Home() {
   const { accessToken } = useAuth();
 
   const [localMovies, setLocalMovies] = useState([]);
-  const [tmdbMovies,  setTmdbMovies]  = useState([]);
-  const [genresMap,   setGenresMap]   = useState({});
-  const [status,      setStatus]      = useState("idle");
-  const [page,        setPage]        = useState(1);
-  const [totalPages,  setTotalPages]  = useState(1);
+  const [tmdbMovies, setTmdbMovies]   = useState([]);
+  const [genresMap,  setGenresMap]    = useState({});
+  const [status,     setStatus]       = useState("idle");
+  const [page,       setPage]         = useState(1);
+  const [totalPages, setTotalPages]   = useState(1);
 
   // API-ключ TMDb із .env
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
-    if (!accessToken) return; // чекаємо токен
+    if (!accessToken) return; // очікуємо, доки зʼявиться токен
 
     const fetchAll = async () => {
       setStatus("loading");
       try {
-        // 1) Локальні фільми
+        // 1) локальні фільми
         const local = await getLocalMovies(accessToken);
         setLocalMovies(local);
 
@@ -51,7 +51,7 @@ export default function Home() {
 
         setTotalPages(tmdb1.total_pages);
 
-        // 3) мапа жанрів: id → назва
+        // 3) мапа жанрів
         const map = {};
         genresData.genres.forEach((g) => (map[g.id] = g.name));
         setGenresMap(map);
@@ -69,7 +69,7 @@ export default function Home() {
     fetchAll();
   }, [accessToken, page, apiKey]);
 
-  if (status === "loading") return <p>Завантаження…</p>;
+  if (status === "loading") return <p>Завантаження...</p>;
   if (status === "failed")  return <p>Не вдалося завантажити фільми.</p>;
 
   // 5) зливаємо локальні та TMDb
