@@ -1,40 +1,41 @@
-// src/pages/Home.jsx
+// src/pages/Home/Home.jsx
 import React, { useEffect, useState } from "react";
-import MovieCard from "../../components/MovieCard";
-import Banner from "./Banner";
-import { useAuth } from "../../context/AuthContext";
+import MovieCard       from "../../components/MovieCard";
+import Banner          from "./Banner";
+
+import { useAuth }     from "../../context/AuthContext";
 import { getLocalMovies } from "../../api/movies";
 
 export default function Home() {
   const { accessToken } = useAuth();
+
   const [localMovies, setLocalMovies] = useState([]);
   const [tmdbMovies, setTmdbMovies]   = useState([]);
-  const [genresMap, setGenresMap]     = useState({});
-  const [status, setStatus]           = useState("idle");
-  const [page, setPage]               = useState(1);
+  const [genresMap,  setGenresMap]    = useState({});
+  const [status,     setStatus]       = useState("idle");
+  const [page,       setPage]         = useState(1);
   const [totalPages, setTotalPages]   = useState(1);
 
-  // Беремо API-ключ із .env
+  // API-ключ TMDb із .env
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
-    if (!accessToken) return;  // чекаємо, поки є токен
+    if (!accessToken) return; // очікуємо, доки зʼявиться токен
 
     const fetchAll = async () => {
       setStatus("loading");
       try {
-        // 1) Отримуємо локальні фільми
+        // 1) локальні фільми
         const local = await getLocalMovies(accessToken);
         setLocalMovies(local);
 
-        // 2) Два запити до TMDb popular + genres
+        // 2) TMDb — дві сторінки popular + жанри
         const [res1, res2, resGenres] = await Promise.all([
           fetch(
             `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page}`
           ),
           fetch(
-            `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page +
-              1}`
+            `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page + 1}`
           ),
           fetch(
             `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=uk-UA`
@@ -51,14 +52,12 @@ export default function Home() {
 
         setTotalPages(tmdb1.total_pages);
 
-        // 3) Створюємо мапу жанрів
+        // 3) мапа жанрів
         const map = {};
-        genresData.genres.forEach((g) => {
-          map[g.id] = g.name;
-        });
+        genresData.genres.forEach((g) => (map[g.id] = g.name));
         setGenresMap(map);
 
-        // 4) Зберігаємо результати
+        // 4) TMDb-результати
         setTmdbMovies([...tmdb1.results, ...tmdb2.results]);
 
         setStatus("succeeded");
@@ -74,11 +73,11 @@ export default function Home() {
   if (status === "loading") return <p>Завантаження...</p>;
   if (status === "failed")  return <p>Не вдалося завантажити фільми.</p>;
 
-  // 5) Об’єднуємо локальні та TMDb
+  // 5) зливаємо локальні та TMDb
   const movies = [
     ...localMovies.map((m) => ({
       ...m,
-      id: m._id,                 // щоб MovieCard міг взяти movie.id
+      id: m._id,
       genre_ids: m.genre_ids || [],
       vote_average: m.vote_average || 0,
     })),
