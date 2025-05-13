@@ -1,4 +1,5 @@
-import React            from "react";
+// src/router/AppRouter.jsx
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Home          from "../pages/Home/Home";

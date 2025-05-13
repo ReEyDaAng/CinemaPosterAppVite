@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import MovieCard from "../../components/MovieCard";
 import Banner    from "./Banner";
 
-import { useAuth }       from "../../context/AuthContext";
+import { useAuth }        from "../../context/AuthContext";
 import { getLocalMovies } from "../../api/movies";
 
 export default function Home() {
@@ -15,20 +15,20 @@ export default function Home() {
   const [page,        setPage]        = useState(1);
   const [totalPages,  setTotalPages]  = useState(1);
 
-  // API-ключ TMDb з .env
+  // API-ключ TMDb із .env
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
-    if (!accessToken) return;               // чекаємо токен
+    if (!accessToken) return; // чекаємо токен
 
     const fetchAll = async () => {
       setStatus("loading");
       try {
-        // 1) локальні фільми
+        // 1) Локальні фільми
         const local = await getLocalMovies(accessToken);
         setLocalMovies(local);
 
-        // 2) TMDb: дві сторінки popular + жанри
+        // 2) TMDb — дві сторінки popular + жанри
         const [res1, res2, resGenres] = await Promise.all([
           fetch(
             `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page}`
@@ -72,7 +72,7 @@ export default function Home() {
   if (status === "loading") return <p>Завантаження…</p>;
   if (status === "failed")  return <p>Не вдалося завантажити фільми.</p>;
 
-  // обʼєднуємо локальні та TMDb-фільми (локальним даємо id = _id)
+  // 5) зливаємо локальні та TMDb
   const movies = [
     ...localMovies.map((m) => ({
       ...m,
@@ -85,9 +85,7 @@ export default function Home() {
 
   return (
     <div className="space-y-10 mt-[-56px]">
-      {movies.length > 0 && (
-        <Banner movie={movies[0]} genres={genresMap} />
-      )}
+      {movies.length > 0 && <Banner movie={movies[0]} genres={genresMap} />}
 
       <div className="ml-[290px] flex flex-wrap gap-[24px]">
         {movies.slice(1, 21).map((movie) => (
