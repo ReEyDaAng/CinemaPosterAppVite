@@ -1,97 +1,142 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import { useAuth } from './AuthContext';
+import { getFavorites, addFavorite, removeFavorite } from '../api/favorites';
 
 const FavoritesContext = createContext();
 export const useFavorites = () => useContext(FavoritesContext);
 
-// утиліта, щоб із movie взяти payload
-const buildPayload = (movie) => {
-  const isTmdb = movie.tmdb_id || typeof movie.id === 'number';
-
-  return isTmdb
-    ? {
-      source: 'tmdb',
-      movieId: Number(movie.tmdb_id ?? movie.id),
-      data: movie,
-    }
-    : {
-      source: 'local',
-      movieId: movie._id,          // ObjectId
-    };
-};
 export function FavoritesProvider({ children }) {
-  const { authFetch, user } = useAuth();
+  const { accessToken } = useAuth();
+  const [favorites, setFavorites] = useState(new Map());
+  const [loading, setLoading] = useState(false);
 
-  const [favorites, setFavorites] = useState(new Map()); // Map<movieId, favDoc>
-  const [loading,   setLoading]   = useState(false);
+  const getFavoriteKey = (movie, isTmdb) => {
+    const movieId = isTmdb ? (movie.tmdb_id || movie.id) : (movie._id || movie.id);
+    return isTmdb ? `tmdb-${movieId}` : `local-${movieId}`;
+  };
 
-  /* --- початкове завантаження -------------------------------------- */
-  useEffect(() => {
-    if (!user) { setFavorites(new Map()); return; }
+  const refreshFavorites = useCallback(async () => {
+    if (!accessToken) return;
 
-    let cancelled = false;
-    (async () => {
-      try {
-        setLoading(true);
-        const list = await (await authFetch('/api/favorites')).json();
-        if (cancelled) return;
-        const map = new Map(list.map((f) => {
-          const id = f.source === 'tmdb' ? f.tmdbId : f.movie;
-          return [id, f];
-        }));
-        setFavorites(map);
-      } catch (e) { console.error(e); }
-      finally      { setLoading(false); }
-    })();
-    return () => { cancelled = true; };
-  }, [user, authFetch]);
+    try {
+      const list = await getFavorites(accessToken);
+      if (!Array.isArray(list)) return;
 
-  /* --- toggle ------------------------------------------------------- */
-  const toggleFavorite = async (movie) => {
-    // movie може бути об’єктом або id
-    const payload = typeof movie === 'object' ? buildPayload(movie) : null;
-    const movieId =
-      typeof movie === 'object'
-        ? payload.movieId
-        : movie;                    // якщо передали id
+      const map = new Map(
+        list
+          .map((f) => {
+            if ((f.source === 'tmdb' && !f.tmdbId) || (f.source === 'local' && !f.movie?._id)) {
+              console.warn('Invalid favorite entry skipped:', f);
+              return null;
+            }
+            const key = f.source === 'tmdb' ? `tmdb-${f.tmdbId}` : `local-${f.movie._id}`;
+            return [key, f];
+          })
+          .filter(Boolean)
+      );
 
-    if (loading || !user) return;   // блокуємо повторні кліки
-
-    if (favorites.has(movieId)) {
-      // видаляємо
-      setLoading(true);
-      try {
-        const favDoc = favorites.get(movieId);
-        await authFetch(`/api/favorites/${favDoc._id}`, { method: 'DELETE' });
-        const newMap = new Map(favorites);
-        newMap.delete(movieId);
-        setFavorites(newMap);
-      } catch (e) { console.error(e); }
-      finally      { setLoading(false); }
-    } else if (payload) {
-      // додаємо
-      setLoading(true);
-      try {
-        const res  = await authFetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const favDoc = await res.json(); // { _id, source,… }
-        setFavorites(new Map(favorites).set(movieId, favDoc));
-      } catch (e) { console.error(e); }
-      finally      { setLoading(false); }
+      setFavorites(map);
+    } catch (err) {
+      console.error('Failed to refresh favorites:', err);
     }
-  };
+  }, [accessToken]);
 
-  const value = {
-    favorites,
-    loading,
-    toggleFavorite,
-  };
+  useEffect(() => {
+    if (!accessToken) {
+      setFavorites(new Map());
+      return;
+    }
+
+    (async () => {
+      setLoading(true);
+      try {
+        await refreshFavorites();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [accessToken, refreshFavorites]);
+
+  const toggleFavorite = useCallback(
+    async (movie, isTmdb) => {
+      if (!accessToken || !movie) return;
+
+      setLoading(true);
+      try {
+        const movieId = isTmdb ? movie.tmdb_id || movie.id : movie._id || movie.id;
+        if (!movieId) {
+          console.warn('Cannot toggle favorite: missing movie ID');
+          return;
+        }
+
+        const favKey = getFavoriteKey(movie, isTmdb);
+        const next = new Map(favorites);
+
+        if (favorites.has(favKey)) {
+          const favDoc = favorites.get(favKey);
+          const id = favDoc?._id || favDoc?.id;
+          if (!id) {
+            console.warn('Cannot remove favorite: missing _id');
+            return;
+          }
+
+          try {
+            await removeFavorite(id, accessToken);
+            next.delete(favKey);
+            setFavorites(next);
+          } catch (err) {
+            console.error(err);
+          }
+          return;
+        }
+
+        const payload = isTmdb
+          ? { source: 'tmdb', movieId, data: movie }
+          : { source: 'local', movieId, data: movie }; 
+
+
+        console.log('[ADD PAYLOAD]', payload);
+
+        const saved = await addFavorite(payload, accessToken);
+
+        if (!saved || typeof saved !== 'object') {
+          console.warn('Invalid favorite response. Refreshing list...');
+          await refreshFavorites();
+          return;
+        }
+
+        if (payload.source === 'local' && (!saved.movie || !saved.movie._id)) {
+          console.warn('Invalid local favorite structure. Refreshing list...');
+          await refreshFavorites();
+          return;
+        }
+
+        const enriched = payload.source === 'tmdb'
+          ? saved
+          : { ...saved, movie: saved.movie, _id: saved._id };
+
+        next.set(favKey, enriched);
+        setFavorites(next);
+      } catch (err) {
+        console.error('toggleFavorite error:', err);
+        await refreshFavorites();
+      } finally {
+        setLoading(false);
+      }
+    },
+    [favorites, accessToken, refreshFavorites]
+  );
 
   return (
-    <FavoritesContext.Provider value={value}>
+    <FavoritesContext.Provider value={{ favorites, loading, toggleFavorite, getFavoriteKey }}>
       {children}
     </FavoritesContext.Provider>
   );

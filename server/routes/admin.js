@@ -22,6 +22,20 @@ router.get('/genres', (req, res) => {
   res.json(["Action","Comedy","Drama","Horror","Sci-Fi","Romance"]);
 });
 
+// GET /api/admin/films/:id — отримати локальний фільм за ID
+router.get('/films/:id', async (req, res) => {
+  try {
+    const movie = await Film.findById(req.params.id);
+    if (!movie) {
+      return res.status(404).json({ message: 'Фільм не знайдено' });
+    }
+    res.json(movie);
+  } catch (err) {
+    console.error('Помилка при завантаженні фільму:', err);
+    res.status(500).json({ message: 'Не вдалося завантажити фільм' });
+  }
+});
+
 // GET /api/admin/films
 router.get('/films', async (req, res) => {
   try {
