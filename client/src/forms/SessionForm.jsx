@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 // SessionForm як модальне вікно для додавання/редагування сеансу
 export default function SessionForm({ initialData, movieId, onSubmit, onCancel }) {
-  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Додано стандартне значення
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   // Якщо є початкові дані, розбиваємо ISO на дату та час
   const [date, setDate] = useState(
     initialData?.sessionTime?.split('T')[0] || ''
@@ -31,7 +31,7 @@ export default function SessionForm({ initialData, movieId, onSubmit, onCancel }
       // Формуємо тіло запиту з правильними ключами
       const sessionTime = new Date(`${date}T${time}`).toISOString();
       const body = id
-        ? { sessionTime, price: Number(price) }  // Added sessionTime to the update request
+        ? { sessionTime, price: Number(price) }
         : {
             movie: movieId,
             sessionTime: sessionTime,
@@ -43,9 +43,8 @@ export default function SessionForm({ initialData, movieId, onSubmit, onCancel }
         throw new Error('Необхідна авторизація. Будь ласка, увійдіть в систему.');
       }
 
-      // Check if token is valid before making request
       if (token === 'undefined' || token === 'null') {
-        localStorage.removeItem('AccessToken'); // Clear invalid token
+        localStorage.removeItem('AccessToken');
         throw new Error('Недійсний токен авторизації. Будь ласка, увійдіть в систему знову.');
       }
 
@@ -59,7 +58,7 @@ export default function SessionForm({ initialData, movieId, onSubmit, onCancel }
       });
 
       if (res.status === 401) {
-        localStorage.removeItem('AccessToken'); // Clear expired token
+        localStorage.removeItem('AccessToken');
         throw new Error('Сесія закінчилася. Будь ласка, увійдіть в систему знову.');
       }
 

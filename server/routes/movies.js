@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   res.json(await LocalMovie.findAll());
 });
 
-// додати новий (захищено)
+// додати новий
 router.post('/', auth, async (req, res) => {
   const m = await LocalMovie.create({ 
     ...req.body, 

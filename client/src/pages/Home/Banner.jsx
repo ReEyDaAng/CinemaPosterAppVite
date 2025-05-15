@@ -39,47 +39,42 @@ export default function Banner({ movie }) {
     : `${API}/${posterUrl.replace(/^\/?/, '')}`;
 
   return (
-  <Link
-    to={`/movie/${movieId}`}
-    className="relative block h-[455px] overflow-hidden ml-[258px] mr-[-1rem] group"
-    style={{
-      backgroundImage: `url(${backgroundImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    }}
-  >
-    <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent p-10 pb-[53px] flex flex-col justify-end text-white z-10">
-      <h2 className="text-4xl font-bold mb-2">{title}</h2>
-      <div className="flex text-lg items-center mb-4 gap-[10px]">
-        <p>{dateLabel}</p>
-        <span>|</span>
-        <p className="text-yellow-500 font-semibold">★ {rating}</p>
-      </div>
-      <div className="flex items-center gap-4">
-        {/* Зупиняємо клік по кнопках, щоб не переходило по посиланню */}
-        <button
-          onClick={(e) => e.preventDefault()}
-          className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-[14px] h-[54px] w-[180px] whitespace-nowrap text-white text-[16px] font-semibold transition"
-        >
-          Дивитись зараз
-        </button>
-        <button
-          onClick={(e) => {
-            e.preventDefault(); // Зупинити переходи по посиланню
-            toggleFavorite(movie, isTmdb);
-          }}
-          disabled={loading}
-          className="w-[54px] h-[54px] flex items-center justify-center backdrop-blur-[5.93px]"
-          style={{
-            borderRadius: '8.296px',
-            border: '0.593px solid white',
-            background: 'linear-gradient(99deg,#FFF 3.36%,rgba(255,255,255,0) 238.16%)',
-          }}
-        >
-          {liked ? <FilledHeartIcon size={24} /> : <EmptyHeartIcon size={24} />}
-        </button>
+    <div
+      className="relative block h-[455px] overflow-hidden ml-[258px] mr-[-1rem] group"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent p-10 pb-[53px] flex flex-col justify-end text-white z-10">
+        <h2 className="text-4xl font-bold mb-2">{title}</h2>
+        <div className="flex text-lg items-center mb-4 gap-[10px]">
+          <p>{dateLabel}</p>
+          <span>|</span>
+          <p className="text-yellow-500 font-semibold">★ {rating}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link
+            to={`/movie/${movieId}`}
+            className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-[14px] h-[54px] w-[180px] whitespace-nowrap text-white text-[16px] font-semibold transition flex items-center justify-center"
+          >
+            Дивитись зараз
+          </Link>
+          <button
+            onClick={() => toggleFavorite(movie, isTmdb)}
+            disabled={loading}
+            className="w-[54px] h-[54px] flex items-center justify-center backdrop-blur-[5.93px]"
+            style={{
+              borderRadius: '8.296px',
+              border: '0.593px solid white',
+              background: 'linear-gradient(99deg,#FFF 3.36%,rgba(255,255,255,0) 238.16%)',
+            }}
+          >
+            {liked ? <FilledHeartIcon size={24} /> : <EmptyHeartIcon size={24} />}
+          </button>
+        </div>
       </div>
     </div>
-  </Link>
-);
+  );
 }

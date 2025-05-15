@@ -33,7 +33,7 @@ app.use('/api/tickets', ticketsRouter);
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 const PORT = process.env.PORT || 5000;
-// якщо жоден маршрут не спрацював — не «висіти», а повернути 404
+// якщо жоден маршрут не спрацював — повернути 404
 app.use((req, res) => {
   return res.status(404).json({ message: 'Route not found' });
 });

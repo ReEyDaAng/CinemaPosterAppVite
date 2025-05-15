@@ -16,7 +16,7 @@ export const delFromFavs = createAsyncThunk(
   'favorites/remove',
   async ({ id, authFetch }) => {
     await removeFavorite(id, authFetch);
-    return id;        // повернемо id, щоб extraReducer міг прибрати з масиву
+    return id;
   }
 );
 

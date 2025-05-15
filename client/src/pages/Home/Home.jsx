@@ -1,4 +1,3 @@
-// src/pages/Home/Home.jsx
 import React, { useEffect, useState } from "react";
 import MovieCard       from "../../components/MovieCard";
 import Banner          from "./Banner";
@@ -25,11 +24,11 @@ export default function Home() {
     const fetchAll = async () => {
       setStatus("loading");
       try {
-        // 1) локальні фільми
+        // локальні фільми
         const local = await getLocalMovies(accessToken);
         setLocalMovies(local);
 
-        // 2) TMDb — дві сторінки popular + жанри
+        // TMDb — дві сторінки popular + жанри
         const [res1, res2, resGenres] = await Promise.all([
           fetch(
             `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=uk-UA&page=${page}`
@@ -52,12 +51,12 @@ export default function Home() {
 
         setTotalPages(tmdb1.total_pages);
 
-        // 3) мапа жанрів
+        // мапа жанрів
         const map = {};
         genresData.genres.forEach((g) => (map[g.id] = g.name));
         setGenresMap(map);
 
-        // 4) TMDb-результати
+        // TMDb-результати
         setTmdbMovies([...tmdb1.results, ...tmdb2.results]);
 
         setStatus("succeeded");
@@ -73,7 +72,7 @@ export default function Home() {
   if (status === "loading") return <p>Завантаження...</p>;
   if (status === "failed")  return <p>Не вдалося завантажити фільми.</p>;
 
-  // 5) зливаємо локальні та TMDb
+  // локальні та TMDb
   const movies = [
     ...localMovies.map((m) => ({
       ...m,
@@ -88,7 +87,7 @@ export default function Home() {
     <div className="space-y-10 mt-[-56px]">
       {movies.length > 0 && <Banner movie={movies[0]} genres={genresMap} />}
 
-      <div className="ml-[290px] flex flex-wrap gap-[24px]">
+      <div className="ml-[290px] flex flex-wrap gap-[15px]">
         {movies.slice(1, 21).map((movie) => (
           <MovieCard key={movie.id} movie={movie} genres={genresMap} />
         ))}

@@ -24,7 +24,6 @@ export default function MovieForm(props) {
     const fetchGenres = async () => {
       try {
         setLoadingGenres(true);
-        // **тут додано префікс /api/**
         const res = await fetch(`${API}/api/admin/genres`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
         });

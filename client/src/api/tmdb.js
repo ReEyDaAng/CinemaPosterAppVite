@@ -1,4 +1,3 @@
-// src/api/tmdb.js
 const TMDB_BASE = "https://api.themoviedb.org/3";
 
 /**

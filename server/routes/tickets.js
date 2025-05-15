@@ -1,6 +1,6 @@
 const express = require('express')
 const Ticket  = require('../models/Ticket')
-const auth    = require('../middleware/auth') // ваш JWT-мідлвар
+const auth    = require('../middleware/auth')
 
 const router = express.Router()
 

@@ -49,15 +49,15 @@ export default function MovieCard({ movie, genres = {}, fluid = false }) {
   const rating = movie.rating ?? movie.vote_average ?? 0;
 
   const handleToggle = (e) => {
-    e.stopPropagation(); // 🛑 Зупиняє клік по Link
-    e.preventDefault();  // 🛑 Зупиняє навігацію
+    e.stopPropagation();
+    e.preventDefault();
     if (!loading) toggleFavorite(movie, isTmdb);
   };
 
   return (
     <Link
       to={`/movie/${movieId}`}
-      className={`block bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition ${
+      className={`block bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-white-2xl transition ${
         fluid ? 'w-full' : 'w-72'
       }`}
     >

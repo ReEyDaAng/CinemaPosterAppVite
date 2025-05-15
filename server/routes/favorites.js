@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose'); // ← обовʼязково
+const mongoose = require('mongoose');
 const Favorite = require('../models/Favorite');
 const LocalMovie = require('../models/LocalMovie');
 const authenticate = require('../middleware/auth');
@@ -36,7 +36,7 @@ router.post('/', authenticate, async (req, res) => {
   let { source, movieId, data } = req.body;
 
   try {
-    // 🛠️ Перетворення movieId на ObjectId, якщо це локальний фільм
+    // Перетворення movieId на ObjectId, якщо це локальний фільм
     if (source === 'local') {
       try {
         movieId = new mongoose.Types.ObjectId(movieId);

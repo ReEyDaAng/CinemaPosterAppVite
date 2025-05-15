@@ -22,7 +22,6 @@ export async function addFavorite(payload, accessToken) {
     body: JSON.stringify(payload),
   });
 
-  // Handle 204 No Content
   if (res.status === 204) return null;
 
   if (!res.ok) {
@@ -30,7 +29,6 @@ export async function addFavorite(payload, accessToken) {
     throw new Error(`Cannot add favorite: ${errorText}`);
   }
 
-  // Handle empty response
   const text = await res.text();
   if (!text) return null;
 
@@ -50,10 +48,9 @@ export async function removeFavorite(id, accessToken) {
     },
   });
 
-  if (res.status === 204) return; // Success with no content
+  if (res.status === 204) return;
   if (!res.ok) throw new Error('Cannot delete favorite');
 
-  // Handle cases where server might return content
   try {
     return res.json();
   } catch (err) {

@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   res.json(await Session.findAll());
 });
 
-// додати (захищено)
+// додати
 router.post('/', auth, async (req, res) => {
   const s = await Session.create(req.body);
   res.status(201).json(s);
